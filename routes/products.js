@@ -3,6 +3,8 @@ const { ConnectionCheckOutFailedEvent } = require('mongodb');
 var router = express.Router();
 let productModel = require('../schemas/product')
 let CategoryModel = require('../schemas/category')
+let {check_authentication,check_authorization} = require('../utils/check_auth')
+let constants = require('../utils/constants')
 
 function buildQuery(obj){
   console.log(obj);
@@ -57,7 +59,7 @@ router.get('/:id', async function(req, res, next) {
   }
 });
 
-router.post('/', async function(req, res, next) {
+router.post('/',check_authentication,check_authorization(constants.MOD_PERMISSION), async function(req, res, next) {
   try {
     let cate = await CategoryModel.findOne({name:req.body.category})
     if(cate){
@@ -85,7 +87,7 @@ router.post('/', async function(req, res, next) {
     });
   }
 });
-router.put('/:id', async function(req, res, next) {
+router.put('/:id',check_authentication,check_authorization(constants.MOD_PERMISSION), async function(req, res, next) {
   try {
     let updateObj = {};
     let body = req.body;
@@ -121,7 +123,7 @@ router.put('/:id', async function(req, res, next) {
     });
   }
 });
-router.delete('/:id', async function(req, res, next) {
+router.delete('/:id',check_authentication,check_authorization(constants.ADMIN_PERMISSION), async function(req, res, next) {
   try {
     let product = await productModel.findById(req.params.id);
     if(product){

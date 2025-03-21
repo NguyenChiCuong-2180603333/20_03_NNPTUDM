@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 let categoryModel = require('../schemas/category')
+let {check_authentication,check_authorization} = require('../utils/check_auth')
+let constants = require('../utils/constants')
 
 
 /* GET users listing. */
@@ -30,7 +32,7 @@ router.get('/:id', async function(req, res, next) {
   }
 });
 
-router.post('/', async function(req, res, next) {
+router.post('/',check_authentication,check_authorization(constants.MOD_PERMISSION), async function(req, res, next) {
   try {
     let newCategory = new categoryModel({
       name: req.body.name,

@@ -6,6 +6,8 @@ let jwt = require('jsonwebtoken')
 let constants = require('../utils/constants')
 let {check_authentication} = require('../utils/check_auth')
 let bcrypt = require('bcrypt')
+let {check_authentication,check_authorization} = require('../utils/check_auth')
+
 
 /* GET users listing. */
 router.post('/login', async function (req, res, next) {
