@@ -1,10 +1,14 @@
 let mongoose = require('mongoose');
+const slugify = require('slugify');
 
 let productSchema = new mongoose.Schema({
     name:{
         type:String,
         unique: true,
         required:true
+    },slug:{
+        type: String,
+        unique: true
     },
     price:{
         type:Number,
@@ -31,5 +35,14 @@ let productSchema = new mongoose.Schema({
     }
 },{
     timestamps:true
-})
+});
+productSchema.pre('save', function(next) {
+    if (this.isModified('name') || !this.slug) {
+        this.slug = slugify(this.name, {
+            lower: true,
+            strict: true
+        });
+    }
+    next();
+});
 module.exports = mongoose.model('product',productSchema);

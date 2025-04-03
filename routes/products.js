@@ -3,6 +3,7 @@ const { ConnectionCheckOutFailedEvent } = require('mongodb');
 var router = express.Router();
 let productModel = require('../schemas/product')
 let CategoryModel = require('../schemas/category')
+const slugify = require('slugify');
 
 function buildQuery(obj){
   console.log(obj);
@@ -53,6 +54,47 @@ router.get('/:id', async function(req, res, next) {
     res.status(404).send({
       success:false,
       message:"khong co id phu hop"
+    });
+  }
+});
+
+/* GET product by category slug and product slug */
+router.get('/slug/:category/:product', async function(req, res, next) {
+  try {
+    const categorySlug = req.params.category;
+    const productSlug = req.params.product;
+    
+    // Find category by slug
+    const category = await categoryModel.findOne({ slug: categorySlug });
+    if (!category) {
+      return res.status(404).send({
+        success: false,
+        message: "Category not found"
+      });
+    }
+    
+    // Find product by slug and category ID
+    const product = await productModel.findOne({
+      slug: productSlug,
+      category: category._id,
+      isDeleted: false
+    }).populate("category");
+    
+    if (!product) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found"
+      });
+    }
+    
+    res.status(200).send({
+      success: true,
+      data: product
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: error.message
     });
   }
 });
